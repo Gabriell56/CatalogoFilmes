@@ -3,47 +3,33 @@ package com.example.catalogofilmes
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.catalogofilmes.navigation.AppNavigation
-import com.example.catalogofilmes.ui.theme.CatalogoFilmesTheme
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.catalogofilmes.data.local.MovieDatabase
+import com.example.catalogofilmes.data.repository.MovieRepository
+import com.example.catalogofilmes.ui.navigation.NavGraph
+import com.example.catalogofilmes.viewmodel.MovieViewModel
+import com.example.catalogofilmes.viewmodel.MovieViewModelFactory
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+
+        val database = MovieDatabase.getDatabase(this)
+        val repository = MovieRepository(database.movieDao())
+
         setContent {
-            CatalogoFilmesTheme {
-                AppNavigation()
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
+            MaterialTheme {
+                Surface(modifier = Modifier.fillMaxSize()) {
+                    val viewModel: MovieViewModel = viewModel(
+                        factory = MovieViewModelFactory(repository)
                     )
+                    NavGraph()
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    CatalogoFilmesTheme {
-        Greeting("Android")
     }
 }
